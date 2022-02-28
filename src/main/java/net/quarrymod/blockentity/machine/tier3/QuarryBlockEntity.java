@@ -215,8 +215,6 @@ public class QuarryBlockEntity extends PowerAcceptorBlockEntity implements ITool
 					miningSpentedEnergy -= getEnergyPerExcavation();
 			}
 
-			if (excavationState == ExcavationState.InProgress && currentTickTime % 20 == 0)
-				RecipeCrafter.soundHanlder.playSound(false, this);
 		}
 	}
 
@@ -380,7 +378,7 @@ public class QuarryBlockEntity extends PowerAcceptorBlockEntity implements ITool
 
 		return !state.isAir() 
 		&& !(block instanceof FluidBlock)
-		&& state.getHardness(world, blockPos) >= 0f
+		&& (state.getHardness(world, blockPos) >= 0f || isOreCheckId(Registry.BLOCK.getId(block).toString()))
 		&& !isDrillTube(state)
 		&& (getMineAll() || isOreCheckId(Registry.BLOCK.getId(block).toString()));
 	}
@@ -398,6 +396,9 @@ public class QuarryBlockEntity extends PowerAcceptorBlockEntity implements ITool
 		ItemStack item = Items.NETHERITE_PICKAXE.getDefaultStack();
 		item.addEnchantment(Enchantments.FORTUNE, fortuneLevel);
 		item.addEnchantment(Enchantments.SILK_TOUCH, isSilkTouch ? 1 : 0);
+		if (isSilkTouch && isOreCheckId(Registry.BLOCK.getId(blockState.getBlock()).toString())){
+			return List.of(blockState.getBlock().asItem().getDefaultStack());
+		}
 		return Block.getDroppedStacks(blockState, (ServerWorld)world, blockPos, world.getBlockEntity(blockPos), null, item);
 	}
 
